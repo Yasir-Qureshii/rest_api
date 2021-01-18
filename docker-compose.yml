@@ -9,4 +9,26 @@ services:
     volumes:
       - ./app:/app
     command: >
-      sh -c "python manage.py run  server 0.0.0.0.8000"
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+    environment:
+      - DB_HOST=db
+      - db_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+    depends_on:
+      - db
+
+  db:
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=supersecretpassword
+
+
+# docker-compose allows us to run docker image easily from our project location
+# allows us to manage different services that make our project
+
